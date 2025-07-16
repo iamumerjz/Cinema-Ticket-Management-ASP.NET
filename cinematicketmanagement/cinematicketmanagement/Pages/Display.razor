@@ -1,0 +1,127 @@
+﻿@page "/display"
+@using Microsoft.EntityFrameworkCore;
+@inject NavigationManager NavigationManager
+
+@inject AppDbContext dbContext
+
+<style>
+    body {
+        font-family: 'Roboto', sans-serif;
+        background-color: #f9f9f9;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .card {
+        background-color: #f7f7f7;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+    th,
+    td {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+    }
+
+    th {
+        background-color: #000;
+        color: #fff;
+        font-weight: bold;
+    }
+
+    .button-container {
+        display: flex;
+        justify-content: left;
+    }
+
+    .submit-button {
+        background-color: #48BEFF;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+
+        .submit-button:hover {
+            background-color: #27A6EB;
+        }
+
+
+    .blue-line {
+        border: none;
+        height: 5px;
+        background-color: #27A6EB;
+        margin-bottom: 20px;
+    }
+</style>
+
+<div class="container">
+    <h1><b>Displaying Student Info</b></h1>
+    <hr class="blue-line">
+    @if (registrations != null && registrations.Any())
+    {
+        @foreach (var reg in registrations)
+        {
+            <div class="card">
+                <h3>@reg.regId</h3>
+                <p><strong>Student Name:</strong> @reg.Name</p>
+                <p><strong>Department:</strong> @reg.Department</p>
+                <p><strong>CGPA:</strong> @reg.Cgpa</p>
+            </div>
+        }
+    }
+    else
+    {
+        <p>No registrations found.</p>
+    }
+    <button type="button" class="submit-button" @onclick="add">Add Students</button>
+</div>
+
+@code {
+    public Rege newReg = new Rege();
+    public List<Rege> registrations;
+
+    protected override async Task OnInitializedAsync()
+    {
+        registrations = await dbContext.Registeration.ToListAsync();
+    }
+
+    private void add()
+    {
+        NavigationManager.NavigateTo($"/");
+    }
+
+}

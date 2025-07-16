@@ -1,0 +1,170 @@
+﻿@page "/"
+@using Microsoft.EntityFrameworkCore
+@inject AppDbContext dbContext
+@inject NavigationManager NavigationManager
+
+<PageTitle>Index</PageTitle>
+
+<style>
+    body {
+        background-color: #f2f2f2; /* Set background color of the entire screen */
+    }
+    .container {
+        max-width: 400px;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+    }
+
+    .btn-primary {
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: #fff;
+        cursor: pointer;
+    }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+    .message {
+        margin-top: 10px;
+        text-align: center;
+    }
+
+    .button-container {
+        display: flex;
+        justify-content: left;
+    }
+
+    .submit-button {
+        background-color: #48BEFF;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+
+        .submit-button:hover {
+            background-color: #27A6EB;
+        }
+
+
+    .blue-line {
+        border: none;
+        height: 5px;
+        background-color: #27A6EB;
+        margin-bottom: 20px;
+    }
+</style>
+
+<div class="container">
+    <h1><b>Student Registration</b></h1>
+    <hr class="blue-line">
+
+    <form>
+        <div class="form-group">
+            <label for="regid">Registration ID</label>
+            <input type="text" class="form-control" @bind="regid" />
+        </div>
+
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" class="form-control" @bind="name" />
+        </div>
+
+        <div class="form-group">
+            <label for="department">Department</label>
+            <input type="text" class="form-control" @bind="department" />
+        </div>
+
+        <div class="form-group">
+            <label for="cgpa">CGPA</label>
+            <input type="text" class="form-control" @bind="cgpa" />
+        </div>
+
+        <button type="button" class="btn btn-primary" @onclick="submit">Submit</button>
+        <p class="message" style="background-color: #27A6EB; color: #ffffff;  text-align: center; margin-top: 20px;">@savedMsg</p>
+    </form>
+
+    @if (ShowDisplayButton)
+    {
+        <div class="button-container">
+            <button type="button" class="submit-button" @onclick="display">Display Students</button>
+        </div>
+    }
+</div>
+
+@code {
+    private string savedMsg = "";
+    private string name = "";
+    private string regid = "";
+    private string department = "";
+    private string cgpa = "";
+    private bool ShowDisplayButton;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ShowDisplayButton = await dbContext.Registeration.AnyAsync();
+    }
+
+    public async Task submit()
+    {
+        if (string.IsNullOrWhiteSpace(regid) || string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(department) || string.IsNullOrWhiteSpace(cgpa))
+        {
+            savedMsg = "Please fill in all fields.";
+            return;
+        }
+
+        var newReg = new Rege
+            {
+                regId = regid,
+                Name = name,
+                Department = department,
+                Cgpa = cgpa
+            };
+
+        dbContext.Registeration.Add(newReg);
+        await dbContext.SaveChangesAsync();
+        savedMsg = "Registration Successful!";
+        ShowDisplayButton = true;
+    }
+
+    private void display()
+    {
+        NavigationManager.NavigateTo($"/display");
+    }
+}
